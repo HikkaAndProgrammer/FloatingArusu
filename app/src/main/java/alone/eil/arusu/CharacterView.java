@@ -53,7 +53,7 @@ public class CharacterView extends SurfaceView implements Runnable {
 	@SuppressLint("UseCompatLoadingForDrawables")
 	public CharacterView(Context _context) {
 		super(_context);
-		this.m_renderThread = new Thread();
+		this.m_renderThread = new Thread(this);
 		this.m_updateThread = new UpdateThread(this);
 
 		this.surfaceHolder = this.getHolder();
@@ -173,7 +173,7 @@ public class CharacterView extends SurfaceView implements Runnable {
 
 			this.surfaceHolder.unlockCanvasAndPost(this.m_canvas);
 
-			Log.d("Maria", "posted!");
+			//Log.d("Maria", "posted!");
 		}
 	}
 }

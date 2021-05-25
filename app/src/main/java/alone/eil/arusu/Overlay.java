@@ -13,6 +13,7 @@ import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -114,12 +115,17 @@ public class Overlay extends Service {
 
 			@Override
 			public boolean onTouch(View _view, MotionEvent _event) {
+				//Log.d("Maria", "Touched Maria!");
+
 				if (_event.getAction() == MotionEvent.ACTION_MOVE) {
+					Log.d("Maria", "ActionMove performed!");
+
 					int x = (int) _event.getRawX();
 					int y = (int) _event.getRawY();
 
-					//checking how much they moved
-					if (Math.sqrt((this.rsx - x) * (this.rsx - x) + (this.rsy - y) * (this.rsy - y)) < m_layoutParams.width >> 3)
+					//checking how much she moved
+					if (Math.sqrt((this.rsx - x) * (this.rsx - x) + (this.rsy - y) * (this.rsy - y))
+							< m_layoutParams.width >> 3)
 						return true;
 
 					m_layoutParams.x = x - this.sx;
@@ -129,7 +135,15 @@ public class Overlay extends Service {
 
 					//sound not to play
 					this.isPlayingSound = false;
+				} else if (_event.getAction() == MotionEvent.ACTION_DOWN) {
+					this.isPlayingSound = true;
+					this.rsx = (int) _event.getRawX();
+					this.rsy = (int) _event.getRawY();
+					this.sx = (int) _event.getX();
+					this.sy = (int) _event.getY();
 				} else if (_event.getAction() == MotionEvent.ACTION_UP && this.isPlayingSound) {
+					Log.d("Maria", "ActionUp performed!");
+
 					if (isPlayingNyaa)
 						//playing sound if necessary
 						soundPool.play(
@@ -156,12 +170,10 @@ public class Overlay extends Service {
 						if (isClearsMemory) {
 							Runtime.getRuntime().gc();
 						}
-
-						return true;
 					}
 				}
-
-				return false;
+				
+				return true;
 			}
 		});
 
