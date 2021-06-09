@@ -112,13 +112,13 @@ public class CharacterView extends SurfaceView implements Runnable {
 
 			editor.putString("characterName", MainActivity.characterName);
 			MainActivity.characterName = "";
-			//eh, shit code, it's recursion
-			this.update();
+
+			this.m_image = this.getImage();
 		}
 	}
 
 	//updates sizes
-	public void update(short _width, short _height) {
+	public void updateSize(short _width, short _height) {
 		this.width = _width;
 		this.height = _height;
 		this.amplitude = (short) (this.height / 32);
@@ -131,22 +131,13 @@ public class CharacterView extends SurfaceView implements Runnable {
 
 		if (sharedPreferences.getString("characterName", "").equals(""))
 			return getResizedBitmap(
-					BitmapFactory.decodeResource(
-							this.m_context.getResources(),
-							this.m_ids[sharedPreferences.getInt("character", 0)]
-					),
-					this.width,
-					this.height - this.amplitude * 2
-			);
+					BitmapFactory.decodeResource(this.m_context.getResources(),
+							this.m_ids[sharedPreferences.getInt("character", 0)]),
+					this.width, this.height - this.amplitude * 2);
 		else
-			return getResizedBitmap(
-					BitmapFactory.decodeFile(sharedPreferences.getString(
-							"characterName",
-							"")
-					),
-					this.width,
-					this.height - this.amplitude * 2
-			);
+			return getResizedBitmap(BitmapFactory.decodeFile(sharedPreferences.getString(
+							"characterName", "")),
+					this.width, this.height - this.amplitude * 2);
 	}
 
 	//render thread with crutches

@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,128 +44,138 @@ public class MainActivity extends Activity {
 		//piece of shit code
 		now = this;
 
-		if (checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) != PackageManager.PERMISSION_GRANTED) {
-			requestPermissions(new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW}, 0);
+		if (this.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW)
+				!= PackageManager.PERMISSION_GRANTED) {
+			this.requestPermissions(
+					new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW},
+					0
+			);
 		}
-		startService(new Intent(this, Overlay.class)); //запуск сервиса
+		//invoke service
+		this.startService(new Intent(this, Overlay.class));
 		//это подготовка
-		LinearLayout main__ = new LinearLayout(this);
-		ScrollView main_ = new ScrollView(this);
-		main_.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-		LinearLayout main = new LinearLayout(this);
-		main.setPadding(4, 8, 4, 0);
-		main.setOrientation(LinearLayout.VERTICAL);
-		main.setGravity(Gravity.CENTER_HORIZONTAL);
+		LinearLayout background = new LinearLayout(this);
+		ScrollView scrollView = new ScrollView(this);
+		scrollView.setLayoutParams(
+				new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT)
+		);
+		LinearLayout foreground = new LinearLayout(this);
+		foreground.setPadding(4, 8, 4, 0);
+		foreground.setOrientation(LinearLayout.VERTICAL);
+		foreground.setGravity(Gravity.CENTER_HORIZONTAL);
 
-		//сохраненные настройки
-		SharedPreferences sp = getSharedPreferences("saved", Context.MODE_PRIVATE);
+		//saved settings
+		SharedPreferences sharedPreferences = getSharedPreferences("saved", Context.MODE_PRIVATE);
 
-		//красивый шрифт
+		//beautiful font, Nya~
 		Typeface dalsp = Typeface.createFromAsset(getAssets(), "dalsp.ttf");
 
-		characterName = sp.getString("characterName", "");
+		characterName = sharedPreferences.getString("characterName", "");
 
-		//вкл/выкл оверлей
-		CheckBox so = new CheckBox(this);
-		so.setTextSize(24);
-		so.setTypeface(dalsp);
-		so.setText(getString(R.string.overlay_show));
-		so.setTextColor(0xffe3e3e3);
-		so.setGravity(Gravity.CENTER);
-		so.setChecked(true);
-		so.setOnCheckedChangeListener((buttonView, isChecked) -> {
+		//on/off overlay
+		CheckBox showOverlay = new CheckBox(this);
+		showOverlay.setTextSize(24);
+		showOverlay.setTypeface(dalsp);
+		showOverlay.setText(getString(R.string.overlay_show));
+		showOverlay.setTextColor(0xffe3e3e3);
+		showOverlay.setGravity(Gravity.CENTER);
+		showOverlay.setChecked(true);
+		showOverlay.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.now.setWindow(isChecked);
-			SharedPreferences.Editor editor = sp.edit();
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isShowingOverlay", isChecked);
 			editor.apply();
 		});
-		so.setChecked(sp.getBoolean("isShowingOverlay", true));
+		showOverlay.setChecked(sharedPreferences.getBoolean("isShowingOverlay", true));
 
-		//текст
-		TextView tv = new TextView(this);
-		tv.setTextSize(24);
-		tv.setTypeface(dalsp);
-		tv.setText(getString(R.string.size));
-		tv.setTextColor(0xffe3e3e3);
-		tv.setGravity(Gravity.CENTER);
+		//text
+		TextView textView = new TextView(this);
+		textView.setTextSize(24);
+		textView.setTypeface(dalsp);
+		textView.setText(getString(R.string.size));
+		textView.setTextColor(0xffe3e3e3);
+		textView.setGravity(Gravity.CENTER);
 
-		//управление размером
+		//handle sizes
 		SeekBar size = new SeekBar(this);
 		size.setMax(220);
 		size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			//надо
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
-
-			//надо
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {}
 
-			//когда изменили seekbar
+			//on seekbar changes
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				int progress = seekBar.getProgress();
-				Overlay.now.setSizes((short) (128f * ((float) (progress + 20) / 50f)), (short) (160f * ((float) (progress + 20) / 50f)));
-				SharedPreferences.Editor editor = sp.edit();
+				Overlay.now.setSizes(
+						(short) (128f * ((float) (progress + 20) / 50f)),
+						(short) (160f * ((float) (progress + 20) / 50f))
+				);
+				SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putInt("size", progress);
-				editor.apply(); //для сохранения настроек
+
+				//for saving settings
+				editor.apply();
 			}
 		});
 
-		//вкл/выкл молнии
-		CheckBox light = new CheckBox(this);
-		light.setText(getString(R.string.lightning));
-		light.setTypeface(dalsp);
-		light.setOnCheckedChangeListener((buttonView, isChecked)
+		//TODO: вкл/выкл молнии
+		CheckBox sowLighting = new CheckBox(this);
+		sowLighting.setText(getString(R.string.lightning));
+		sowLighting.setTypeface(dalsp);
+		sowLighting.setOnCheckedChangeListener((buttonView, isChecked)
 				-> Overlay.now.character.isLightShowing = isChecked);
-		light.setGravity(Gravity.CENTER);
-		light.setTextSize(24);
+		sowLighting.setGravity(Gravity.CENTER);
+		sowLighting.setTextSize(24);
 
-		//настройка выключения блютуза
-		CheckBox bto = new CheckBox(this);
-		bto.setText(getString(R.string.bt_setting));
-		bto.setOnCheckedChangeListener((buttonView, isChecked) -> {
+		//TODO: настройка выключения блютуза
+		CheckBox manageBluetooth = new CheckBox(this);
+		manageBluetooth.setText(getString(R.string.bt_setting));
+		manageBluetooth.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.isResetsBluetooth = isChecked;
-			SharedPreferences.Editor editor = sp.edit();
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isResetsBluetooth", isChecked);
 			editor.apply();
 		});
-		bto.setChecked(sp.getBoolean("isResetsBluetooth", true));
+		manageBluetooth.setChecked(sharedPreferences.getBoolean("isResetsBluetooth", true));
 
-		//настройка очистки памяти
-		CheckBox cm = new CheckBox(this);
-		cm.setText(getString(R.string.mc_setting));
-		cm.setOnCheckedChangeListener((buttonView, isChecked) -> {
+		//TODO: настройка очистки памяти
+		CheckBox manageMemory = new CheckBox(this);
+		manageMemory.setText(getString(R.string.mc_setting));
+		manageMemory.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.isClearsMemory = isChecked;
-			SharedPreferences.Editor editor = sp.edit();
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isClearsMemory", isChecked);
 			editor.apply();
 		});
-		cm.setChecked(sp.getBoolean("isClearsMemory", true));
+		manageMemory.setChecked(sharedPreferences.getBoolean("isClearsMemory", true));
 
-		//настройка звука
-		CheckBox ns = new CheckBox(this);
-		ns.setText(getString(R.string.ns_setting));
-		ns.setOnCheckedChangeListener((buttonView, isChecked) -> {
+		//TODO: настройка звука
+		CheckBox manageVolume = new CheckBox(this);
+		manageVolume.setText(getString(R.string.ns_setting));
+		manageVolume.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.isPlayingNyaa = isChecked;
-			SharedPreferences.Editor editor = sp.edit();
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("ns", isChecked);
 			editor.apply();
 		});
-		ns.setChecked(sp.getBoolean("isPlayingNyaa", true));
+		manageVolume.setChecked(sharedPreferences.getBoolean("isPlayingNyaa", true));
 
-		//настройка движения по синусу
-		CheckBox sm = new CheckBox(this);
-		sm.setText(getString(R.string.sm_setting));
-		sm.setChecked(sp.getBoolean("isSineMotion", true));
-		sm.setOnCheckedChangeListener((buttonView, isChecked) -> {
+		//TODO: настройка движения по синусу
+		CheckBox moveBySine = new CheckBox(this);
+		moveBySine.setText(getString(R.string.sm_setting));
+		moveBySine.setChecked(sharedPreferences.getBoolean("isSineMotion", true));
+		moveBySine.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.now.character.isSineMotion = isChecked;
-			SharedPreferences.Editor editor = sp.edit();
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isSineMotion", isChecked);
 			editor.apply();
 		});
 
-		//имена всех встроенных персонажей
+		//TODO: имена всех встроенных персонажей
 		String[] names = new String[]{
 				getString(R.string.Maria),
 				getString(R.string.ITohka),
@@ -175,7 +186,7 @@ public class MainActivity extends Activity {
 				getString(R.string.Origami),
 				getString(R.string.IOrigami)
 		};
-		//их айдишники в ресурсах
+		//TODO: их айдишники в ресурсах
 		int[] ids = new int[]{
 				R.drawable.maria,
 				R.drawable.i_tohka,
@@ -187,7 +198,7 @@ public class MainActivity extends Activity {
 				R.drawable.i_origami
 		};
 
-		//для выбора персонажа
+		//for character selection
 		Spinner character = new Spinner(this, Spinner.MODE_DIALOG);
 		ArrayAdapter<String> adapter = new ArrayAdapter<>(
 				this,
@@ -200,7 +211,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				Overlay.now.character.characterId = (byte) pos;
-				SharedPreferences.Editor editor = sp.edit();
+				SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putInt("character", pos);
 				editor.putString("characterName", "");
 				editor.apply();
@@ -209,82 +220,86 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-				int spos = sp.getInt("character", 0);
+				int spos = sharedPreferences.getInt("character", 0);
 				Overlay.now.character.characterId = (byte) ids[spos];
-				SharedPreferences.Editor editor = sp.edit();
+				SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putString("characterName", "");
 				editor.apply();
 				Overlay.now.character.update();
 			}
 		});
-		int spos = sp.getInt("character", 0);
+		int spos = sharedPreferences.getInt("character", 0);
 		character.setSelection(spos);
 
-		TextView opacity_t = new TextView(this);
-		opacity_t.setText(getString(R.string.opacity));
-		opacity_t.setTextSize(24);
-		opacity_t.setTypeface(dalsp);
-		opacity_t.setTextColor(0xffe3e3e3);
-		opacity_t.setGravity(Gravity.CENTER);
-		SeekBar opacity = new SeekBar(this);
-		opacity.setMax(70);
-		opacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			//надо
+		//TODO: измнение прозрачности
+		TextView opacityText = new TextView(this);
+		opacityText.setText(getString(R.string.opacity));
+		opacityText.setTextSize(24);
+		opacityText.setTypeface(dalsp);
+		opacityText.setTextColor(0xffe3e3e3);
+		opacityText.setGravity(Gravity.CENTER);
+		SeekBar manageOpacity = new SeekBar(this);
+		manageOpacity.setMax(70);
+		manageOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
-
-			//надо
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {}
 
-			//когда изменили seekbar
+			//on seek bar changed
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				int progress = seekBar.getProgress() + 30 - 1;
-				SharedPreferences.Editor editor = sp.edit();
+				SharedPreferences.Editor editor = sharedPreferences.edit();
 				editor.putInt("opacity", progress);
 				editor.apply();
 				Overlay.now.character.alpha = progress * 256 / 100;
+
+				Log.d("Maria", Integer.toString(progress)
+						+ " " + Integer.toString(Overlay.now.character.alpha)
+						+ " " + Float.toString(Overlay.now.character.getAlpha()));
 			}
 		});
-		int opacity_ = sp.getInt("opacity", 70);
-		opacity.setProgress(opacity_);
+		int opacityProgress = sharedPreferences.getInt("opacity", 70);
+		manageOpacity.setProgress(opacityProgress);
 
-		//чтобы ставить свою картинку
-		Button cc = new Button(this);
-		cc.setOnClickListener(v -> {
+		//to put your own picture
+		Button customPictureButton = new Button(this);
+		customPictureButton.setOnClickListener(v -> {
 			Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-			chooseFile.setType("image/png"); //нам нужны только png
+			//works only with png
+			chooseFile.setType("image/png");
 			chooseFile = Intent.createChooser(chooseFile, "Choose picture");
-			startActivityForResult(chooseFile, 1); //ждем выбора
+			//waiting for selection
+			startActivityForResult(chooseFile, 1);
 		});
-		cc.setText(getString(R.string.custom_char));
+		customPictureButton.setText(getString(R.string.custom_character));
 
 		//на всякий случай
-		main__.setBackgroundColor(0xff2f2f2f);
-		main_.setBackgroundColor(0xff2f2f2f);
-		main.setBackgroundColor(0xff2f2f2f);
+		background.setBackgroundColor(0xff2f2f2f);
+		scrollView.setBackgroundColor(0xff2f2f2f);
+		foreground.setBackgroundColor(0xff2f2f2f);
 
 		//добавляем все, что создали выше
-		main.addView(so);
-		main.addView(sm);
-		main.addView(tv);
-		main.addView(size);
-		main.addView(opacity_t);
-		main.addView(opacity);
-		main.addView(light);
-		main.addView(character);
-		main.addView(bto);
-		main.addView(cm);
-		main.addView(ns);
-		main.addView(cc);
+		foreground.addView(showOverlay);
+		foreground.addView(moveBySine);
+		foreground.addView(textView);
+		foreground.addView(size);
+		foreground.addView(opacityText);
+		foreground.addView(manageOpacity);
+		foreground.addView(sowLighting);
+		foreground.addView(character);
+		foreground.addView(manageBluetooth);
+		foreground.addView(manageMemory);
+		foreground.addView(manageVolume);
+		foreground.addView(customPictureButton);
 
 		//встраиваем это
-		main_.addView(main);
-		main__.addView(main_);
+		scrollView.addView(foreground);
+		background.addView(scrollView);
 
 		//и отображаем
-		setContentView(main__);
+		setContentView(background);
 	}
 
 	private void playOverlay(){

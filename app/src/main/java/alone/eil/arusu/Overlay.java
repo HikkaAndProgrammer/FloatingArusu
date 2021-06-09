@@ -33,7 +33,7 @@ public class Overlay extends Service {
 	//for playing "Nyaa~"
 	public final static SoundPool soundPool = new SoundPool.Builder().setAudioAttributes(
 		new AudioAttributes.Builder()
-				//game works the most effecient
+				//game works the most efficient
 			.setUsage(AudioAttributes.USAGE_GAME)
 				//this is works well too
 			.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -212,7 +212,7 @@ public class Overlay extends Service {
 
 		this.halfOfWidth = (short) (this.m_layoutParams.width / 2);
 
-		this.character.update(
+		this.character.updateSize(
 				(short) this.m_layoutParams.width,
 				(short) this.m_layoutParams.height
 		);

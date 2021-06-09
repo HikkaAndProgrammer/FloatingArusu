@@ -64,6 +64,7 @@ public class UpdateThread extends Thread {
 					this.m_parent.paint = this.m_parent.defaultPaint;
 			}
 			this.m_parent.setAlpha(this.m_parent.alpha);
+			this.m_parent.paint.setAlpha(this.m_parent.alpha);
 			endTime = System.currentTimeMillis();
 		}
 	}
