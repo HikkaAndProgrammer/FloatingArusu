@@ -99,10 +99,7 @@ public class CharacterView extends SurfaceView implements Runnable {
 	//updates image
 	public void update() {
 		//for standard character
-		if (MainActivity.characterName.equals(""))
-			this.m_image = this.getImage();
-		//and for custom
-		else {
+		if (!MainActivity.characterName.equals("")) {
 			SharedPreferences sharedPreferences = FloatingArusu.instance.getSharedPreferences(
 					"saved",
 					Context.MODE_PRIVATE
@@ -113,8 +110,9 @@ public class CharacterView extends SurfaceView implements Runnable {
 			editor.putString("characterName", MainActivity.characterName);
 			MainActivity.characterName = "";
 
-			this.m_image = this.getImage();
 		}
+
+		this.m_image = this.getImage();
 	}
 
 	//updates sizes

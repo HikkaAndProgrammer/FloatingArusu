@@ -20,4 +20,5 @@
     <string name="custom_character">Your image for floating character…</string>
     <string name="sm_setting">Sine movement</string>
     <string name="opacity">Opacity</string>
+    <string name="manage_music_setting">Change music state</string>
 </resources>

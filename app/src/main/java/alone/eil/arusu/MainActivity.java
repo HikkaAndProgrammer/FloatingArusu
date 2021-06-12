@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,19 +122,19 @@ public class MainActivity extends Activity {
 		});
 
 		//TODO: вкл/выкл молнии
-		CheckBox sowLighting = new CheckBox(this);
-		sowLighting.setText(getString(R.string.lightning));
-		sowLighting.setTypeface(dalsp);
-		sowLighting.setOnCheckedChangeListener((buttonView, isChecked)
+		CheckBox showLighting = new CheckBox(this);
+		showLighting.setText(getString(R.string.lightning));
+		showLighting.setTypeface(dalsp);
+		showLighting.setOnCheckedChangeListener((buttonView, isChecked)
 				-> Overlay.now.character.isLightShowing = isChecked);
-		sowLighting.setGravity(Gravity.CENTER);
-		sowLighting.setTextSize(24);
+		showLighting.setGravity(Gravity.CENTER);
+		showLighting.setTextSize(24);
 
 		//TODO: настройка выключения блютуза
 		CheckBox manageBluetooth = new CheckBox(this);
 		manageBluetooth.setText(getString(R.string.bt_setting));
 		manageBluetooth.setOnCheckedChangeListener((buttonView, isChecked) -> {
-			Overlay.isResetsBluetooth = isChecked;
+			Overlay.isResettingBluetooth = isChecked;
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isResetsBluetooth", isChecked);
 			editor.apply();
@@ -146,7 +145,7 @@ public class MainActivity extends Activity {
 		CheckBox manageMemory = new CheckBox(this);
 		manageMemory.setText(getString(R.string.mc_setting));
 		manageMemory.setOnCheckedChangeListener((buttonView, isChecked) -> {
-			Overlay.isClearsMemory = isChecked;
+			Overlay.isClearingMemory = isChecked;
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isClearsMemory", isChecked);
 			editor.apply();
@@ -166,12 +165,22 @@ public class MainActivity extends Activity {
 
 		//TODO: настройка движения по синусу
 		CheckBox moveBySine = new CheckBox(this);
-		moveBySine.setText(getString(R.string.sm_setting));
+		moveBySine.setText(this.getString(R.string.sm_setting));
 		moveBySine.setChecked(sharedPreferences.getBoolean("isSineMotion", true));
 		moveBySine.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			Overlay.now.character.isSineMotion = isChecked;
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isSineMotion", isChecked);
+			editor.apply();
+		});
+
+		CheckBox manageMusic = new CheckBox(this);
+		manageMusic.setText(this.getString(R.string.manage_music_setting));
+		manageMusic.setChecked(sharedPreferences.getBoolean("isManagedMusic", true));
+		manageMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
+			Overlay.isManagingMusic = isChecked;
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putBoolean("isManagedMusic", isChecked);
 			editor.apply();
 		});
 
@@ -255,9 +264,9 @@ public class MainActivity extends Activity {
 				editor.apply();
 				Overlay.now.character.alpha = progress * 256 / 100;
 
-				Log.d("Maria", Integer.toString(progress)
+				/*Log.d("Maria", Integer.toString(progress)
 						+ " " + Integer.toString(Overlay.now.character.alpha)
-						+ " " + Float.toString(Overlay.now.character.getAlpha()));
+						+ " " + Float.toString(Overlay.now.character.getAlpha()));*/
 			}
 		});
 		int opacityProgress = sharedPreferences.getInt("opacity", 70);
@@ -287,10 +296,11 @@ public class MainActivity extends Activity {
 		foreground.addView(size);
 		foreground.addView(opacityText);
 		foreground.addView(manageOpacity);
-		foreground.addView(sowLighting);
+		foreground.addView(showLighting);
 		foreground.addView(character);
 		foreground.addView(manageBluetooth);
 		foreground.addView(manageMemory);
+		foreground.addView(manageMusic);
 		foreground.addView(manageVolume);
 		foreground.addView(customPictureButton);
 

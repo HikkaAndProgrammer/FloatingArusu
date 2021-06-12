@@ -40,12 +40,15 @@ public class Overlay extends Service {
 			.build()
 	).build();
 
+
+
 	@SuppressLint("StaticFieldLeak")
 	public static Overlay now;
 
 	protected static final int track;
-	public volatile static boolean isResetsBluetooth;
-	public volatile static boolean isClearsMemory;
+	public volatile static boolean isManagingMusic;
+	public volatile static boolean isResettingBluetooth;
+	public volatile static boolean isClearingMemory;
 	//is played "Nyaa~"
 	public volatile static boolean isPlayingNyaa;
 	//timer for tick every 15 seconds
@@ -104,8 +107,8 @@ public class Overlay extends Service {
 		SharedPreferences arusuSharedPreferences =
 				FloatingArusu.instance.getSharedPreferences("saved", Context.MODE_PRIVATE);
 		isPlayingNyaa = arusuSharedPreferences.getBoolean("isPlayingNyaa", true);
-		isResetsBluetooth = arusuSharedPreferences.getBoolean("isResetsBluetooth", true);
-		isClearsMemory = arusuSharedPreferences.getBoolean("isClearsMemory", true);
+		isResettingBluetooth = arusuSharedPreferences.getBoolean("isResetsBluetooth", true);
+		isClearingMemory = arusuSharedPreferences.getBoolean("isClearsMemory", true);
 		isShowingOverlay = arusuSharedPreferences.getBoolean("isShowingOverlay", true);
 
 		//on click character
@@ -144,8 +147,8 @@ public class Overlay extends Service {
 				} else if (_event.getAction() == MotionEvent.ACTION_UP && this.isPlayingSound) {
 					Log.d("Maria", "ActionUp performed!");
 
+					//playing sound if necessary
 					if (isPlayingNyaa)
-						//playing sound if necessary
 						soundPool.play(
 								track,
 								1,
@@ -156,7 +159,7 @@ public class Overlay extends Service {
 						);
 
 					//off bluetooth if necessary
-					if (isResetsBluetooth) {
+					if (isResettingBluetooth)
 						try {
 							BluetoothManager bluetoothManager = (BluetoothManager)
 									getBaseContext().getSystemService(BLUETOOTH_SERVICE);
@@ -167,9 +170,12 @@ public class Overlay extends Service {
 							}, 0);
 						}
 
-						if (isClearsMemory) {
-							Runtime.getRuntime().gc();
-						}
+					//clears memory if necessary
+					if (isClearingMemory) Runtime.getRuntime().gc();
+
+					//continue/pause music if necessary
+					if (isManagingMusic) {
+
 					}
 				}
 				
