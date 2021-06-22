@@ -174,7 +174,7 @@ public class MainActivity extends Activity {
 			editor.apply();
 		});
 
-		CheckBox manageMusic = new CheckBox(this);
+		/*CheckBox manageMusic = new CheckBox(this);
 		manageMusic.setText(this.getString(R.string.manage_music_setting));
 		manageMusic.setChecked(sharedPreferences.getBoolean("isManagedMusic", true));
 		manageMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -182,7 +182,7 @@ public class MainActivity extends Activity {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putBoolean("isManagedMusic", isChecked);
 			editor.apply();
-		});
+		});*/
 
 		//TODO: имена всех встроенных персонажей
 		String[] names = new String[]{
@@ -300,7 +300,7 @@ public class MainActivity extends Activity {
 		foreground.addView(character);
 		foreground.addView(manageBluetooth);
 		foreground.addView(manageMemory);
-		foreground.addView(manageMusic);
+		//foreground.addView(manageMusic);
 		foreground.addView(manageVolume);
 		foreground.addView(customPictureButton);
 

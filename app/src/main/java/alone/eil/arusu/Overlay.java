@@ -40,8 +40,6 @@ public class Overlay extends Service {
 			.build()
 	).build();
 
-
-
 	@SuppressLint("StaticFieldLeak")
 	public static Overlay now;
 
@@ -64,6 +62,8 @@ public class Overlay extends Service {
 	public volatile int LAYOUT_FLAG;
 	public volatile short halfOfWidth;
 	public volatile boolean isShowingOverlay;
+
+	public static final ActionPool actions = new ActionPool();
 
 	public final CharacterView character;
 	protected LinearLayout m_main;

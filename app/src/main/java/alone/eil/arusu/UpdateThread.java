@@ -45,14 +45,15 @@ public class UpdateThread extends Thread {
 		long time = 0L;
 
 		while(true) {
+			//calculate dt
+			dt = System.currentTimeMillis() - endTime;
+			//add dt to whole time
+			time += dt;
+			//here time - whole time, A - amplitude
+			//3 is number of shifts to image
+			//so that the image does not exactly go beyond the window
+
 			if (this.m_parent.isSineMotion) {
-				//calculate dt
-				dt = System.currentTimeMillis() - endTime;
-				//add dt to whole time
-				time += dt;
-				//here time - whole time, A - amplitude
-				//3 is number of shifts to image
-				//so that the image does not exactly go beyond the window
 				this.m_parent.yCoordinate = (int) (Math.sin(time / 240d) *
 						this.m_parent.amplitude * 2 + 3);
 
@@ -63,6 +64,9 @@ public class UpdateThread extends Thread {
 					//to remove effect
 					this.m_parent.paint = this.m_parent.defaultPaint;
 			}
+
+			Overlay.actions.update((float) dt);
+
 			this.m_parent.setAlpha(this.m_parent.alpha);
 			this.m_parent.paint.setAlpha(this.m_parent.alpha);
 			endTime = System.currentTimeMillis();
